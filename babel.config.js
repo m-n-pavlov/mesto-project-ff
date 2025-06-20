@@ -1,14 +1,11 @@
-// babel.config.js - файл для конфигурации Babel
-
-// массив пресетов Babel:
 const presets = [
   [
-    '@babel/preset-env', // сообщаем, какой пресет использовать для трансформации современного JS в совместимый код
+    '@babel/preset-env',
     {
-      targets: { edge: '17', ie: '11', firefox: '50', chrome: '64', safari: '11.1' }, // сообщаем, какие версии браузеров поддерживать
-      useBuiltIns: 'entry' // сообщаем, что полифилы для браузеров необходимо использовать из свойства target (по умолчанию babel использует полифилы библиотеки core-js)
+      targets: { edge: '17', ie: '11', firefox: '50', chrome: '64', safari: '11.1' },
+      useBuiltIns: 'entry'
     }
   ]
 ];
 
-module.exports = { presets }; // экспорт конфигурации
+module.exports = { presets };
