@@ -4,7 +4,7 @@ import './pages/index.css'; // импорт собранных WebPack CSS-фа�
 import { createCard, handleLikeClick } from './components/card.js'; // импорт функций из модуля card.js
 import { openModal, closeModal, addEventListeners } from './components/modal.js'; // импорт функций из модуля modal.js
 import { enableValidation, clearValidation } from './components/validation.js'; // импорт функций из модуля validation.js
-import { getUserInfo, getInitialCards, updateProfile, addCard, updateAvatar } from './components/api.js'; // импорт функций из модуля api.js
+import { getUserInfo, getInitialCards, updateProfile, addCard, updateAvatar, deleteCard } from './components/api.js'; // импорт функций из модуля api.js
 
 /* 🟢 2. ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ */
 
@@ -58,7 +58,7 @@ Promise.all([getUserInfo(), getInitialCards()])
     currentUserId = userData._id;
     updateUserInfo(userData);
     cards.forEach(card => {
-      const newCard = createCard(card, handleLikeClick, handleImageClick, currentUserId);
+      const newCard = createCard(card, currentUserId, handleLikeClick, handleImageClick, handleDelete);
       placesList.append(newCard);
     });
   })
@@ -67,6 +67,17 @@ Promise.all([getUserInfo(), getInitialCards()])
   });
 
 /* 🟠 4. ОБРАБОТЧИКИ ФУНКЦИЙ */
+
+/* --- Обработка удаления карточки --- */
+function handleDelete(cardId, cardElement) {
+  deleteCard(cardId)
+    .then(() => {
+      cardElement.remove();
+    })
+    .catch(err => {
+      console.error('Ошибка при удалении карточки:', err);
+    });
+}
 
 /* --- Обновление данных профиля --- */
 function updateUserInfo(userData) {
@@ -126,7 +137,7 @@ function handleNewCardFormSubmit(evt) {
 
   addCard({ name, link })
     .then((card) => {
-      const newCard = createCard(card, handleLikeClick, handleImageClick, currentUserId);
+      const newCard = createCard(card, currentUserId, handleLikeClick, handleImageClick, handleDelete);
       placesList.prepend(newCard);
       closeModal(newCardPopup);
       newCardForm.reset();

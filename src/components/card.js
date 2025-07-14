@@ -1,4 +1,4 @@
-import { deleteCard, likeCard, unlikeCard } from './api.js';
+import { likeCard, unlikeCard } from './api.js';
 
 const cardTemplate = document.querySelector('#card-template').content;
 
@@ -7,28 +7,27 @@ const cardTemplate = document.querySelector('#card-template').content;
 /* --- Обрабатывает клик по лайку: ставит или снимает лайк с карточки --- */
 export function handleLikeClick(cardId, likeButton, likeCount) {
   const isLiked = likeButton.classList.contains('card__like-button_is-active');
+  const likeMethod = isLiked ? unlikeCard : likeCard;
 
-  if (isLiked) {
-    unlikeCard(cardId)
-      .then(updatedCard => {
-        likeButton.classList.remove('card__like-button_is-active');
-        likeCount.textContent = updatedCard.likes.length;
-      })
-      .catch(err => console.error('Ошибка при снятии лайка:', err));
-  } else {
-    likeCard(cardId)
-      .then(updatedCard => {
-        likeButton.classList.add('card__like-button_is-active');
-        likeCount.textContent = updatedCard.likes.length;
-      })
-      .catch(err => console.error('Ошибка при добавлении лайка:', err));
-  }
+  likeMethod(cardId)
+    .then(updatedCard => {
+      likeButton.classList.toggle('card__like-button_is-active');
+      likeCount.textContent = updatedCard.likes.length;
+    })
+    .catch(err => {
+      console.error(
+        isLiked
+          ? 'Ошибка при снятии лайка:'
+          : 'Ошибка при добавлении лайка:',
+        err
+      );
+    });
 }
 
 /* 🟡 2. ГЛАВНАЯ ЭКСПОРТИРУЕМАЯ ФУНКЦИЯ */
 
 /* --- Создаёт DOM-элемент карточки на основе данных и переданных колбеков --- */
-export function createCard(cardData, handleLike, handleClick, currentUserId) {
+export function createCard(cardData, currentUserId, handleLike, handleClick, handleDelete) {
   const cardElement = cardTemplate.querySelector('.places__item').cloneNode(true);
 
   const cardImage = cardElement.querySelector('.card__image');
@@ -53,13 +52,7 @@ export function createCard(cardData, handleLike, handleClick, currentUserId) {
     deleteButton.remove();
   } else {
     deleteButton.addEventListener('click', () => {
-      deleteCard(cardData._id)
-        .then(() => {
-          cardElement.remove();
-        })
-        .catch(err => {
-          console.error('Ошибка при удалении карточки:', err);
-        });
+      handleDelete(cardData._id, cardElement);
     });
   }
 

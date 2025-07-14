@@ -4,11 +4,7 @@
 function checkInputValidity(formElement, inputElement, config) {
   const isPatternMismatch = inputElement.validity.patternMismatch;
   const customMessage = inputElement.dataset.errorMessage;
-  if (isPatternMismatch && customMessage) {
-    inputElement.setCustomValidity(customMessage);
-  } else {
-    inputElement.setCustomValidity('');
-  }
+  inputElement.setCustomValidity(isPatternMismatch && customMessage ? customMessage : '');
   if (!inputElement.validity.valid) {
     showInputError(formElement, inputElement, inputElement.validationMessage, config);
   } else {
